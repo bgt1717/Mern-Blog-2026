@@ -5,9 +5,6 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/test", (req, res) => {
-  res.json({ message: "Auth router is working" });
-});
-
+router.get("/test", (req, res) => res.json({ message: "Auth router is working" }));
 
 export default router;

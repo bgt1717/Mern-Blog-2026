@@ -1,21 +1,20 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.js";
 
 dotenv.config();
-const app = express();
+connectDB();
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
+app.get("/", (req, res) => res.send("API running 🚀"));
+app.post("/ping", (req, res) => res.json({ pong: true }));
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
+app.use("/api/auth", authRoutes);
 
-//brycetown10_db_user
-//SgElLPD2JgJHVgQA
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
