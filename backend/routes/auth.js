@@ -3,8 +3,11 @@ import { registerUser, loginUser } from "../controllers/authController.js";
 
 const router = express.Router();
 
-router.post("/register", registerUser);
+router.post("/register", registerUser); // ✅ NO ()
 router.post("/login", loginUser);
-router.get("/test", (req, res) => res.json({ message: "Auth router is working" }));
+
+router.get("/test", (req, res) => {
+  res.json({ message: "Auth router is working" });
+});
 
 export default router;
