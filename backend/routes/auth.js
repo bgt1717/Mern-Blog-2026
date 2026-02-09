@@ -10,4 +10,12 @@ router.get("/test", (req, res) => {
   res.json({ message: "Auth router is working" });
 });
 
+router.get("/protected", (req, res) => {
+  res.json({
+    message: "You are authenticated",
+    authHeader: req.headers.authorization,
+  });
+});
+
+
 export default router;
