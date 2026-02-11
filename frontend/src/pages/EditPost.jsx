@@ -5,27 +5,48 @@ import API from "../api/axios";
 export default function EditPost() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ title: "", content: "" });
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
-      const res = await API.get(`/posts/${id}`);
-      setFormData({
-        title: res.data.title,
-        content: res.data.content,
-      });
-    };
-    fetchPost();
-  }, [id]);
+      try {
+        const res = await API.get("/posts");
+        const post = res.data.find((p) => p._id === id);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (!post) {
+          alert("Post not found");
+          navigate("/");
+          return;
+        }
+
+        setTitle(post.title);
+        setContent(post.content);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await API.put(`/posts/${id}`, formData);
-    navigate("/");
+
+    try {
+      await API.put(`/posts/${id}`, { title, content });
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      alert("Update failed");
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div style={{ maxWidth: "600px", margin: "2rem auto" }}>
@@ -33,21 +54,44 @@ export default function EditPost() {
 
       <form onSubmit={handleSubmit}>
         <input
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
           required
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginBottom: "1rem",
+          }}
         />
-        <br /><br />
+
         <textarea
-          name="content"
-          value={formData.content}
-          onChange={handleChange}
-          rows={6}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Content"
           required
+          rows="6"
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginBottom: "1rem",
+          }}
         />
-        <br /><br />
-        <button type="submit">Update</button>
+
+        <button
+          type="submit"
+          style={{
+            background: "#444",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            cursor: "pointer",
+            borderRadius: "4px",
+          }}
+        >
+          Update Post
+        </button>
       </form>
     </div>
   );
