@@ -1,13 +1,14 @@
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import API from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const { user } = useAuth(); // ✅ MUST be inside component
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -25,8 +26,28 @@ export default function Home() {
     fetchPosts();
   }, []);
 
-  if (loading) return <p style={{ textAlign: "center" }}>Loading posts...</p>;
-  if (error) return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Delete this post?");
+    if (!confirmDelete) return;
+
+    try {
+      await API.delete(`/posts/${id}`);
+      setPosts((prevPosts) => prevPosts.filter((p) => p._id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
+    }
+  };
+
+  if (loading)
+    return <p style={{ textAlign: "center" }}>Loading posts...</p>;
+
+  if (error)
+    return (
+      <p style={{ color: "red", textAlign: "center" }}>
+        {error}
+      </p>
+    );
 
   return (
     <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
@@ -41,18 +62,33 @@ export default function Home() {
             border: "1px solid #ddd",
             padding: "1rem",
             marginBottom: "1rem",
+            borderRadius: "8px",
           }}
         >
-          <h2>{post.title}</h2>
-
-          <p style={{ color: "#555", fontSize: "0.9rem" }}>
-            By {post.user?.username || "Unknown"} ·{" "}
-            {new Date(post.createdAt).toLocaleDateString()}
-          </p>
-
+          <h3>{post.title}</h3>
           <p>{post.content}</p>
+          <small>By {post.user?.username}</small>
+
+          {/* Show delete only if logged in AND owner */}
+          {user &&
+            String(post.user?._id || post.user) === String(user._id) && (
+              <div style={{ marginTop: "10px" }}>
+                <button
+                  onClick={() => handleDelete(post._id)}
+                  style={{
+                    background: "red",
+                    color: "white",
+                    border: "none",
+                    padding: "6px 12px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
         </div>
-        
       ))}
     </div>
   );
