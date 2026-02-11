@@ -25,18 +25,21 @@ export const updatePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
-    // 🔐 ownership check
-    if (post.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not authorized" });
+    // Ownership check
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     post.title = req.body.title || post.title;
     post.content = req.body.content || post.content;
 
-    const updated = await post.save();
-    res.json(updated);
+    const updatedPost = await post.save();
+
+    res.json(updatedPost);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }

@@ -70,13 +70,14 @@ export default function Home() {
           <small>By {post.user?.username}</small>
 
           {/* Show delete only if logged in AND owner */}
-          {user &&
-            String(post.user?._id || post.user) === String(user._id) && (
-              <div style={{ marginTop: "10px" }}>
+        {user &&
+          String(post.user?._id || post.user) === String(user._id) && (
+            <div style={{ marginTop: "10px" }}>
+              <Link to={`/edit/${post._id}`}>
                 <button
-                  onClick={() => handleDelete(post._id)}
                   style={{
-                    background: "red",
+                    marginRight: "10px",
+                    background: "#444",
                     color: "white",
                     border: "none",
                     padding: "6px 12px",
@@ -84,10 +85,26 @@ export default function Home() {
                     borderRadius: "4px",
                   }}
                 >
-                  Delete
+                  Edit
                 </button>
-              </div>
-            )}
+              </Link>
+
+              <button
+                onClick={() => handleDelete(post._id)}
+                style={{
+                  background: "red",
+                  color: "white",
+                  border: "none",
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  borderRadius: "4px",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+        )}
+
         </div>
       ))}
     </div>
