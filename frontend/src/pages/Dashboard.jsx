@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
-export default function Home() {
+export default function Dashboard() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -13,11 +13,10 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await API.get("/posts");
+        const res = await API.get("/posts/my-posts");
         setPosts(res.data);
       } catch (err) {
         console.error(err);
-        setError("Failed to load posts");
       } finally {
         setLoading(false);
       }
@@ -25,6 +24,7 @@ export default function Home() {
 
     fetchPosts();
   }, []);
+
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Delete this post?");
