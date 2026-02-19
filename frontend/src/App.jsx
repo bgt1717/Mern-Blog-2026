@@ -6,6 +6,8 @@ import CreatePost from "./pages/CreatePost";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EditPost from "./pages/EditPost";
+import './styles/style.css';
+
 
 function App() {
   return (
