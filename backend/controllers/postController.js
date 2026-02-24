@@ -1,15 +1,14 @@
+// controllers/postController.js
 import Post from "../models/Post.js";
 
-// CREATE
 export const createPost = async (req, res) => {
   try {
     console.log("REQ.BODY:", req.body);
-    console.log("REQ.FILE:", req.file);
+    console.log("REQ.FILE:", req.file); // should have file info
     console.log("REQ.USER:", req.user);
 
     const { title, content } = req.body;
-    if (!title || !content)
-      return res.status(400).json({ message: "Title and content required" });
+    if (!title || !content) return res.status(400).json({ message: "Title and content required" });
 
     const post = await Post.create({
       title,
@@ -24,6 +23,8 @@ export const createPost = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 // READ ALL
 export const getPosts = async (req, res) => {
