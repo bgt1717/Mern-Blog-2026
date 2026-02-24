@@ -1,69 +1,70 @@
 import { useState } from "react";
-import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 export default function CreatePost() {
-  const [formData, setFormData] = useState({
-    title: "",
-    content: "",
-  });
-
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // 🔹 State for post fields
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [image, setImage] = useState(null);
 
+  // 🔹 Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+
+    if (!title || !content) {
+      alert("Title and content are required");
+      return;
+    }
 
     try {
-      const res = await API.post("/posts", formData);
-      console.log("POST CREATED:", res.data);
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+      if (image) formData.append("image", image);
 
+      // Send to backend
+      await API.post("/posts", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Redirect to home
       navigate("/");
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Failed to create post");
+      alert("Failed to create post");
     }
   };
 
   return (
+    
     <div style={{ maxWidth: "600px", margin: "2rem auto" }}>
-      <h2>Create Post</h2>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <form onSubmit={handleSubmit}>
+      <h2>Create New Post</h2>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+          name="image"
+        />
         <input
           type="text"
-          name="title"
-          placeholder="Post title"
-          value={formData.title}
-          onChange={handleChange}
-          required
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
-
-        <br /><br />
-
         <textarea
-          name="content"
-          placeholder="Write your post..."
-          value={formData.content}
-          onChange={handleChange}
-          rows={6}
-          required
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
         />
-
-        <br /><br />
-
-        <button type="submit">Publish</button>
+        <button type="submit">Create Post</button>
       </form>
+
     </div>
   );
 }

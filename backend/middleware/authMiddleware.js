@@ -11,12 +11,14 @@ export const protect = async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select("-password");
-      next();
-    } catch (err) {
-      console.error(err);
-      res.status(401).json({ message: "Not authorized" });
+      next(); // VERY IMPORTANT to call next()
+    } catch (error) {
+      console.error(error);
+      return res.status(401).json({ message: "Not authorized" });
     }
-  } else {
-    res.status(401).json({ message: "No token, authorization denied" });
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
   }
 };
