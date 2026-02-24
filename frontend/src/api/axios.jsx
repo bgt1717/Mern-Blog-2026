@@ -8,6 +8,7 @@ const API = axios.create({
 });
 
 // 🔐 Attach token automatically
+//Checks localStorage for a stored user.
 API.interceptors.request.use(
   (config) => {
     const user = JSON.parse(localStorage.getItem("user"));
