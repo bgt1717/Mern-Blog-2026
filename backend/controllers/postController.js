@@ -1,49 +1,70 @@
-// controllers/postController.js
 import Post from "../models/Post.js";
+
+/*
+  IMPORTANT:
+  If you are using multer-storage-cloudinary,
+  the image is already uploaded to Cloudinary.
+  req.file.path === Cloudinary secure_url
+*/
 
 export const createPost = async (req, res) => {
   try {
-    console.log("REQ.BODY:", req.body);
-    console.log("REQ.FILE:", req.file); // should have file info
-    console.log("REQ.USER:", req.user);
+    console.log("REQ.FILE:", req.file);
 
     const { title, content } = req.body;
-    if (!title || !content) return res.status(400).json({ message: "Title and content required" });
+
+    if (!title || !content) {
+      return res
+        .status(400)
+        .json({ message: "Title and content required" });
+    }
+
+    // Image is already uploaded by multer
+    const imageUrl = req.file ? req.file.path : null;
 
     const post = await Post.create({
       title,
       content,
       user: req.user._id,
-      image: req.file?.path || null, // Cloudinary URL
+      image: imageUrl,
     });
 
     res.status(201).json(post);
   } catch (error) {
     console.error("🔥 CREATE POST ERROR:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message });
   }
 };
 
 
 
-// READ ALL
+// =========================
+// READ ALL POSTS
+// =========================
 export const getPosts = async (req, res) => {
   try {
     const posts = await Post.find()
       .populate("user", "username")
       .sort({ createdAt: -1 });
+
     res.json(posts);
   } catch (error) {
-    console.error(error);
+    console.error("GET POSTS ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// UPDATE
+
+// =========================
+// UPDATE POST
+// =========================
 export const updatePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
     // Ownership check
     if (post.user.toString() !== req.user._id.toString()) {
@@ -52,21 +73,31 @@ export const updatePost = async (req, res) => {
 
     post.title = req.body.title || post.title;
     post.content = req.body.content || post.content;
-    if (req.file) post.image = req.file.path; // update image if uploaded
+
+    // If new image uploaded, multer already handled Cloudinary upload
+    if (req.file) {
+      post.image = req.file.path;
+    }
 
     const updatedPost = await post.save();
     res.json(updatedPost);
   } catch (err) {
-    console.error(err);
+    console.error("UPDATE ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// DELETE
+
+// =========================
+// DELETE POST
+// =========================
 export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
 
     // Ownership check
     if (post.user.toString() !== req.user._id.toString()) {
@@ -74,9 +105,10 @@ export const deletePost = async (req, res) => {
     }
 
     await post.deleteOne();
+
     res.json({ message: "Post deleted" });
   } catch (err) {
-    console.error(err);
+    console.error("DELETE ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
