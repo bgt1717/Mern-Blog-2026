@@ -59,6 +59,7 @@ export const getPosts = async (req, res) => {
 // UPDATE POST
 // =========================
 export const updatePost = async (req, res) => {
+  console.log("UPDATE REQ.FILE:", req.file);
   try {
     const post = await Post.findById(req.params.id);
 
@@ -71,18 +72,20 @@ export const updatePost = async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
+    // Update text fields
     post.title = req.body.title || post.title;
     post.content = req.body.content || post.content;
 
-    // If new image uploaded, multer already handled Cloudinary upload
+    // If new image uploaded → replace
     if (req.file) {
-      post.image = req.file.path;
+      post.image = req.file.path; // multer already uploaded to Cloudinary
     }
 
     const updatedPost = await post.save();
     res.json(updatedPost);
-  } catch (err) {
-    console.error("UPDATE ERROR:", err);
+
+  } catch (error) {
+    console.error("UPDATE ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

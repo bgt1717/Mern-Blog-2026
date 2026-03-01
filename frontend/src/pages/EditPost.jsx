@@ -8,49 +8,45 @@ export default function EditPost() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [currentImage, setCurrentImage] = useState("");
+  const [newImage, setNewImage] = useState(null);
 
+  // Fetch post
   useEffect(() => {
     const fetchPost = async () => {
-      try {
-        const res = await API.get("/posts");
-        const post = res.data.find((p) => p._id === id);
+      const res = await API.get(`/posts`);
+      const post = res.data.find((p) => p._id === id);
 
-        if (!post) {
-          alert("Post not found");
-          navigate("/");
-          return;
-        }
-
+      if (post) {
         setTitle(post.title);
         setContent(post.content);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+        setCurrentImage(post.image);
       }
     };
 
     fetchPost();
-  }, [id, navigate]);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await API.put(`/posts/${id}`, { title, content });
-      navigate("/");
-    } catch (err) {
-      console.error(err);
-      alert("Update failed");
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+
+    if (newImage) {
+      formData.append("image", newImage);
     }
+
+    await API.put(`/posts/${id}`, formData);
+
+    navigate("/");
   };
 
-  if (loading) return <p>Loading...</p>;
-
   return (
-    <div style={{ maxWidth: "600px", margin: "2rem auto" }}>
+    <div className="edit-container">
       <h2>Edit Post</h2>
+      
 
       <form onSubmit={handleSubmit}>
         <input
@@ -58,40 +54,45 @@ export default function EditPost() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
-          required
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "1rem",
-          }}
         />
 
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Content"
-          required
-          rows="6"
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "1rem",
-          }}
         />
 
-        <button
-          type="submit"
-          style={{
-            background: "#444",
-            color: "white",
-            border: "none",
-            padding: "10px 20px",
-            cursor: "pointer",
-            borderRadius: "4px",
-          }}
-        >
-          Update Post
-        </button>
+        {/* Show existing image */}
+        {currentImage && !newImage && (
+          <div>
+            <p>Current Image:</p>
+            <img
+              src={currentImage}
+              alt="Current"
+              style={{ width: "200px", marginBottom: "10px" }}
+            />
+          </div>
+        )}
+
+        {/* Show preview of new image */}
+        {newImage && (
+          <div>
+            <p>New Image Preview:</p>
+            <img
+              src={URL.createObjectURL(newImage)}
+              alt="Preview"
+              style={{ width: "200px", marginBottom: "10px" }}
+            />
+          </div>
+        )}
+
+        <input
+          type="file"
+          onChange={(e) => setNewImage(e.target.files[0])}
+          
+        />
+        
+        <button type="submit">Update Post</button>
       </form>
     </div>
   );
