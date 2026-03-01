@@ -1,5 +1,6 @@
 import { useState } from "react";
 import API from "../api/axios";
+import "./Register.css";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -12,10 +13,7 @@ export default function Register() {
   const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -30,56 +28,60 @@ export default function Register() {
       setSuccess("User registered successfully!");
       setFormData({ username: "", email: "", password: "" });
     } catch (err) {
-      console.error(err);
-      setError(
-        err.response?.data?.message || "Registration failed"
-      );
+      setError(err.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "2rem auto" }}>
-      <h2>Register</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>Register</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+        {error && <div className="auth-error">{error}</div>}
+        {success && <div className="auth-success">{success}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          required
-        />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Enter username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <br /><br />
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <br /><br />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-
-        <br /><br />
-
-        <button type="submit">Register</button>
-      </form>
+          <button type="submit" className="auth-btn">
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
