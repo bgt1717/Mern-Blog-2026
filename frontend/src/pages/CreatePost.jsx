@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import "./CreatePost.css";
 
 export default function CreatePost() {
   const navigate = useNavigate();
@@ -37,11 +38,13 @@ export default function CreatePost() {
     }
   };
 
-  return (
-    <div style={{ maxWidth: "600px", margin: "2rem auto" }}>
+return (
+  <div className="create-container">
+    <div className="create-card">
       <h2>Create New Post</h2>
+
       <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div>
+        <div className="form-group">
           <label>Image (optional)</label>
           <input
             type="file"
@@ -51,7 +54,7 @@ export default function CreatePost() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Title</label>
           <input
             type="text"
@@ -60,7 +63,7 @@ export default function CreatePost() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label>Content</label>
           <textarea
             value={content}
@@ -68,20 +71,21 @@ export default function CreatePost() {
           />
         </div>
 
-        <button type="submit">Create Post</button>
+        <button type="submit" className="submit-btn">
+          Create Post
+        </button>
       </form>
 
-      {/* Optional preview */}
       {image && (
-        <div style={{ marginTop: "1rem" }}>
+        <div className="image-preview">
           <p>Preview:</p>
           <img
             src={URL.createObjectURL(image)}
             alt="preview"
-            style={{ maxWidth: "100%" }}
           />
         </div>
       )}
     </div>
-  );
+  </div>
+);
 }

@@ -1,0 +1,126 @@
+/* Page Layout */
+.create-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f4f6f9, #e8edf5);
+  padding: 2rem;
+}
+
+/* Card */
+.create-card {
+  width: 100%;
+  max-width: 650px;
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Heading */
+.create-card h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.4rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #444;
+}
+
+/* Inputs & Textarea */
+.form-group input[type="text"],
+.form-group textarea,
+.form-group input[type="file"] {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+/* Focus Effect */
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* Button */
+.submit-btn {
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #4f46e5;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Image Preview */
+.image-preview {
+  margin-top: 1.5rem;
+}
+
+.image-preview p {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.image-preview img {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .create-card {
+    padding: 1.8rem;
+  }
+
+  .create-card h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-container {
+    padding: 1rem;
+  }
+
+  .create-card {
+    padding: 1.5rem;
+  }
+}
