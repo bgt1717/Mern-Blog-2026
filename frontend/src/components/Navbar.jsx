@@ -10,7 +10,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="nav-left">
         <Link to="/" className="logo">
-          MyBlog
+          Bryce's Blog
         </Link>
       </div>
 
