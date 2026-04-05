@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/axios";
+import "./EditPost.css";
 
 export default function EditPost() {
   const { id } = useParams();
