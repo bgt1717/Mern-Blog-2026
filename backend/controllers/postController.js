@@ -11,7 +11,7 @@ export const createPost = async (req, res) => {
   try {
     console.log("REQ.FILE:", req.file);
 
-    const { title, content } = req.body;
+    const { title, content, category } = req.body;
 
     if (!title || !content) {
       return res
@@ -25,6 +25,7 @@ export const createPost = async (req, res) => {
     const post = await Post.create({
       title,
       content,
+      category,
       user: req.user._id,
       image: imageUrl,
     });
@@ -75,6 +76,7 @@ export const updatePost = async (req, res) => {
     // Update text fields
     post.title = req.body.title || post.title;
     post.content = req.body.content || post.content;
+    post.category = req.body.category || post.category;
 
     // If new image uploaded → replace
     if (req.file) {
