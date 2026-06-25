@@ -41,6 +41,7 @@
 /* Inputs & Textarea */
 .form-group input[type="text"],
 .form-group textarea,
+.form-group select,
 .form-group input[type="file"] {
   padding: 0.85rem 1rem;
   border-radius: 8px;
@@ -57,7 +58,8 @@
 
 /* Focus Effect */
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
   border-color: #4f46e5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);

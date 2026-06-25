@@ -11,6 +11,7 @@ export default function CreatePost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
+  const [category, setCategory] = useState("SQL");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,6 +25,8 @@ export default function CreatePost() {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
+      formData.append("category", category);
+
       if (image) formData.append("image", image);
 
       // Send post request
@@ -63,6 +66,21 @@ return (
           />
         </div>
 
+        <div className="form-group">
+          <label>Category</label>
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="Programming">Programming</option>
+            <option value="AI">AI</option>
+            <option value="Tutorials">Tutorials</option>
+            <option value="Career">Career</option>
+            <option value="Personal">Personal</option>
+          </select>
+        </div>
+        
         <div className="form-group">
           <label>Content</label>
           <textarea
