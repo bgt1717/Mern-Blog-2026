@@ -58,6 +58,9 @@ export default function Home() {
 
       {posts.map((post) => (
         <div className="post-card" key={post._id}>
+
+          <span className="category-badge">{post.category}</span>
+
           <h3 className="post-title">{post.title}</h3>
 
           {post.image && (
@@ -67,8 +70,12 @@ export default function Home() {
               className="post-image"
             />
           )}
-
-          <p className="post-content">{post.content}</p>
+          {/* Shows the first 220 characters of the post content, followed by "..." if it's longer than that. */}
+          <p className="post-content">
+          {post.content.length > 220
+            ? `${post.content.substring(0,220)}...`
+            : post.content}
+        </p>
 
           <small className="post-author">
             By {post.user?.username}
