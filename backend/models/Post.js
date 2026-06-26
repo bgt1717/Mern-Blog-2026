@@ -31,6 +31,7 @@ const postSchema = new mongoose.Schema(
         "AI",
         "Projects",
         "Career",
+        "Personal"
       ],
       default: "SQL",
     },

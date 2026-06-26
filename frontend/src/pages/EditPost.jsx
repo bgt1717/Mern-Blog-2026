@@ -11,6 +11,7 @@ export default function EditPost() {
   const [content, setContent] = useState("");
   const [currentImage, setCurrentImage] = useState("");
   const [newImage, setNewImage] = useState(null);
+  const [category, setCategory] = useState("SQL");
 
   // Fetch post
   useEffect(() => {
@@ -22,6 +23,7 @@ export default function EditPost() {
         setTitle(post.title);
         setContent(post.content);
         setCurrentImage(post.image);
+        setCategory(post.category);
       }
     };
 
@@ -34,6 +36,7 @@ export default function EditPost() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
+    formData.append("category", category);
 
     if (newImage) {
       formData.append("image", newImage);
@@ -48,7 +51,6 @@ export default function EditPost() {
     <div className="edit-container">
       <h2>Edit Post</h2>
       
-
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -57,11 +59,28 @@ export default function EditPost() {
           placeholder="Title"
         />
 
+        {/* Category Dropdown */}
+        <div className="form-group">
+          <label>Category</label>
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="Web Development">Programming</option>
+            <option value="SQL">SQL</option>
+            <option value="AI">AI</option>
+            <option value="Projects">Career</option>
+            <option value="Personal">Personal</option>
+          </select>
+        </div>
+
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Content"
         />
+
 
         {/* Show existing image */}
         {currentImage && !newImage && (
