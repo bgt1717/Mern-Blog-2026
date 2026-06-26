@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import "./Home.css";
 
 export default function Home() {
   const { user } = useAuth();
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -38,71 +40,52 @@ export default function Home() {
     }
   };
 
-  if (loading)
-    return <p style={{ textAlign: "center" }}>Loading posts...</p>;
-  if (error)
-    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
+  if (loading) {
+    return <p className="loading">Loading posts...</p>;
+  }
+
+  if (error) {
+    return <p className="error">{error}</p>;
+  }
 
   return (
-    <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
-      <h1>Latest Posts</h1>
+    <div className="home-container">
+      <h1 className="home-title">Latest Posts</h1>
 
-      {posts.length === 0 && <p>No posts yet.</p>}
+      {posts.length === 0 && (
+        <p className="no-posts">No posts yet.</p>
+      )}
 
       {posts.map((post) => (
-        <div
-          key={post._id}
-          style={{
-            border: "1px solid #ddd",
-            padding: "1rem",
-            marginBottom: "1rem",
-            borderRadius: "8px",
-          }}
-        >
-          <h3>{post.title}</h3>
+        <div className="post-card" key={post._id}>
+          <h3 className="post-title">{post.title}</h3>
 
-          {/* Display image if it exists */}
           {post.image && (
             <img
               src={post.image}
               alt={post.title}
-              style={{ maxWidth: "100%", marginBottom: "10px" }}
+              className="post-image"
             />
           )}
 
-          <p>{post.content}</p>
-          <small>By {post.user?.username}</small>
+          <p className="post-content">{post.content}</p>
 
-          {/* Edit/Delete buttons only for post owner */}
+          <small className="post-author">
+            By {post.user?.username}
+          </small>
+
           {user &&
             String(post.user?._id || post.user) === String(user._id) && (
-              <div style={{ marginTop: "10px" }}>
+              <div className="post-actions">
                 <Link to={`/edit/${post._id}`}>
-                  <button
-                    style={{
-                      marginRight: "10px",
-                      background: "#444",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 12px",
-                      cursor: "pointer",
-                      borderRadius: "4px",
-                    }}
-                  >
+                  <button className="edit-btn">
                     Edit
                   </button>
                 </Link>
 
                 <button
+                  className="delete-btn"
                   onClick={() => handleDelete(post._id)}
-                  style={{
-                    background: "red",
-                    color: "white",
-                    border: "none",
-                    padding: "6px 12px",
-                    cursor: "pointer",
-                    borderRadius: "4px",
-                  }}
                 >
                   Delete
                 </button>
