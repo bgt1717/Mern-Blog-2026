@@ -37,8 +37,8 @@
   line-height: 1.8;
   color: #333;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
-
 .loading {
   text-align: center;
   margin-top: 3rem;
