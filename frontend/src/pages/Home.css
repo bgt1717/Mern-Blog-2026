@@ -131,11 +131,14 @@
 }
 
 .read-more-btn {
-  display: inline-block;
-  margin-bottom: 1rem;
-  color: #4f46e5;
-  text-decoration: none;
-  font-weight: 600;
+  display: block;
+  margin: 15px 0;
+  color: red !important;
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: underline;
+  border: 2px solid red;
+  padding: 10px;
 }
 
 .read-more-btn:hover {
