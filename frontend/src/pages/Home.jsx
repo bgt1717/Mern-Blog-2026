@@ -72,8 +72,8 @@ export default function Home() {
           )}
           {/* Shows the first 220 characters of the post content, followed by "..." if it's longer than that. */}
           <p className="post-content">
-          {post.content.length > 220
-            ? `${post.content.substring(0,220)}...`
+          {post.content.length > 85
+            ? `${post.content.substring(0,85)}...`
             : post.content}
         </p>
             <Link
