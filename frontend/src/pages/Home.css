@@ -129,3 +129,15 @@
   font-weight: 600;
   margin-bottom: 12px;
 }
+
+.read-more-btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.read-more-btn:hover {
+  text-decoration: underline;
+}

@@ -76,6 +76,12 @@ export default function Home() {
             ? `${post.content.substring(0,220)}...`
             : post.content}
         </p>
+            <Link
+            to={`/posts/${post._id}`}
+            className="read-more-btn"
+          >
+            Read More →
+          </Link>
 
           <small className="post-author">
             By {post.user?.username}
