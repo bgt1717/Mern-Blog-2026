@@ -1,8 +1,13 @@
 import axios from "axios";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:5000/api"
+    : "https://your-render-backend-url.onrender.com/api");
+
 const API = axios.create({
-  //baseURL: "http://localhost:5000/api",
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: API_URL,
 });
 
 // 🔐 Attach token automatically

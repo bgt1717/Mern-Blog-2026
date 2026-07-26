@@ -11,9 +11,23 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://townsendblog.onrender.com",
+];
+
 app.use(
   cors({
-    origin: "https://townsendblog.onrender.com",
+    origin: function (origin, callback) {
+      // Allow requests like Postman/server-side requests with no origin
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
