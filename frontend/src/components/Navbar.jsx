@@ -15,7 +15,7 @@ export default function Navbar() {
       </div>
 
       <div className="nav-right">
-        <Link to="/">Home</Link>
+        <Link to="/" className="home-link">Home</Link>
 
         {!user ? (
           <>

@@ -93,4 +93,19 @@
     width: 100%;
     text-align: center;
   }
+
+  /* Hide Home link on small screens */
+  .home-link {
+    display: none;
+  }
+
+  /* Keep logout button visible in top-right on mobile */
+  .logout-btn {
+    position: absolute;
+    right: 1rem;
+    top: 0.6rem;
+    width: auto;
+    text-align: center;
+    padding: 0.4rem 0.8rem;
+  }
 }
