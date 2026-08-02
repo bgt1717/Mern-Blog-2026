@@ -34,8 +34,12 @@
   white-space: nowrap;
 }
 
+.navbar-logo:hover {
+  color: #1e3a5f;
+}
+
 /* ================================
-   DESKTOP LINKS
+   DESKTOP NAVIGATION
 ================================ */
 
 .navbar-links {
@@ -45,11 +49,26 @@
 }
 
 .navbar-link {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0;
+
   color: #374151;
+  background-color: transparent;
+  border: none;
+
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 500;
+  line-height: 1.5;
   text-decoration: none;
-  transition: color 0.2s ease;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .navbar-link:hover {
@@ -58,42 +77,52 @@
 
 .navbar-link.active-link {
   color: #1e3a5f;
+  font-weight: 600;
 }
 
 /* ================================
-   BUTTONS INSIDE NAVBAR
+   LOGOUT BUTTON
 ================================ */
 
-.navbar button.navbar-link {
-  padding: 0;
-  font-family: inherit;
-  background: none;
+.logout-button {
+  appearance: none;
+  font: inherit;
+  text-align: left;
+  background-color: transparent;
   border: none;
   cursor: pointer;
 }
 
 /* ================================
-   HAMBURGER
+   HAMBURGER BUTTON
 ================================ */
 
 .hamburger {
   display: none;
+
   width: 40px;
   height: 40px;
   padding: 6px;
-
-  background: transparent;
-  border: none;
-  cursor: pointer;
 
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 5px;
+
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.hamburger:hover {
+  background-color: #f3f6f9;
 }
 
 .hamburger span {
   display: block;
+
   width: 25px;
   height: 2px;
 
@@ -106,7 +135,7 @@
 }
 
 /* ================================
-   MOBILE
+   MOBILE NAVIGATION
 ================================ */
 
 @media (max-width: 768px) {
@@ -128,45 +157,71 @@
 
     position: absolute;
     top: 64px;
-    left: 0;
+    right: 18px;
 
-    width: 100%;
-    padding: 12px 18px 18px;
-
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+    width: 220px;
+    padding: 8px;
 
     flex-direction: column;
     align-items: stretch;
     gap: 4px;
+
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   }
 
   .navbar-links.active {
     display: flex;
   }
 
-  .navbar-link {
+  .navbar-link,
+  .navbar .logout-button {
     display: block;
+
     width: 100%;
     padding: 12px 14px;
 
-    color: #374151;
-    border-radius: 6px;
+    color: #374151 !important;
+    background-color: transparent;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
     text-align: left;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
   }
 
   .navbar-link:hover,
+  .navbar .logout-button:hover {
+    color: #1e3a5f !important;
+    background-color: #eef5ff;
+  }
+
   .navbar-link.active-link {
-    color: #1e3a5f;
-    background-color: #f3f4f6;
+    color: #1e3a5f !important;
+    background-color: #e8f1ff;
+    font-weight: 600;
   }
 
-  .navbar button.navbar-link {
-    padding: 12px 14px;
+  .navbar-link.active-link:hover {
+    color: #1e3a5f !important;
+    background-color: #dcecff;
   }
 
-  /* Hamburger becomes an X */
+  /* Hamburger changes into an X */
 
   .hamburger.open span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
@@ -190,11 +245,13 @@
     padding: 0 14px;
   }
 
-  .navbar-links {
-    padding: 10px 14px 16px;
-  }
-
   .navbar-logo {
     font-size: 1.15rem;
+  }
+
+  .navbar-links {
+    right: 14px;
+    width: calc(100% - 28px);
+    max-width: 220px;
   }
 }

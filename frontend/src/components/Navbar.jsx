@@ -1,18 +1,40 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const isLoggedIn = Boolean(user);
+
   function closeMenu() {
     setMenuOpen(false);
+  }
+
+  function handleLogout() {
+    logout();
+    closeMenu();
+    navigate("/login");
+  }
+
+  function navLinkClass({ isActive }) {
+    return isActive
+      ? "navbar-link active-link"
+      : "navbar-link";
   }
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link to="/" className="navbar-logo" onClick={closeMenu}>
+        <Link
+          to="/"
+          className="navbar-logo"
+          onClick={closeMenu}
+        >
           Townsend Blog
         </Link>
 
@@ -31,43 +53,49 @@ export default function Navbar() {
         <div className={`navbar-links ${menuOpen ? "active" : ""}`}>
           <NavLink
             to="/"
-            className={({ isActive }) =>
-              isActive ? "navbar-link active-link" : "navbar-link"
-            }
+            className={navLinkClass}
             onClick={closeMenu}
           >
             Home
           </NavLink>
 
-          <NavLink
-            to="/create"
-            className={({ isActive }) =>
-              isActive ? "navbar-link active-link" : "navbar-link"
-            }
-            onClick={closeMenu}
-          >
-            Create Post
-          </NavLink>
+          {isLoggedIn ? (
+            <>
+              <NavLink
+                to="/create"
+                className={navLinkClass}
+                onClick={closeMenu}
+              >
+                Create Post
+              </NavLink>
 
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              isActive ? "navbar-link active-link" : "navbar-link"
-            }
-            onClick={closeMenu}
-          >
-            Login
-          </NavLink>
+              <button
+                type="button"
+                className="navbar-link logout-button"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className={navLinkClass}
+                onClick={closeMenu}
+              >
+                Login
+              </NavLink>
 
-          <NavLink
-            to="/register"
-            className={({ isActive }) =>
-              isActive ? "navbar-link active-link" : "navbar-link"
-            }
-            onClick={closeMenu}
-          >
-            Register
-          </NavLink>
+              <NavLink
+                to="/register"
+                className={navLinkClass}
+                onClick={closeMenu}
+              >
+                Register
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
     </nav>
