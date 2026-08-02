@@ -1,37 +1,74 @@
-import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
-  const { user, logout } = useContext(AuthContext);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function closeMenu() {
+    setMenuOpen(false);
+  }
 
   return (
     <nav className="navbar">
-      <div className="nav-left">
-        <Link to="/" className="logo">
-          Bryce's Blog
+      <div className="navbar-container">
+        <Link to="/" className="navbar-logo" onClick={closeMenu}>
+          Townsend Blog
         </Link>
-      </div>
 
-      <div className="nav-right">
-        <Link to="/" className="home-link">Home</Link>
+        <button
+          className={`hamburger ${menuOpen ? "open" : ""}`}
+          type="button"
+          aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((current) => !current)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
 
-        {!user ? (
-          <>
-            <Link to="/login">Login</Link>
-            <Link to="/register" className="primary-link">
-              Register
-            </Link>
-          </>
-        ) : (
-          <>
-            <Link to="/create">Create Post</Link>
-            <button onClick={logout} className="logout-btn">
-              Logout
-            </button>
-          </>
-        )}
+        <div className={`navbar-links ${menuOpen ? "active" : ""}`}>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive ? "navbar-link active-link" : "navbar-link"
+            }
+            onClick={closeMenu}
+          >
+            Home
+          </NavLink>
+
+          <NavLink
+            to="/create"
+            className={({ isActive }) =>
+              isActive ? "navbar-link active-link" : "navbar-link"
+            }
+            onClick={closeMenu}
+          >
+            Create Post
+          </NavLink>
+
+          <NavLink
+            to="/login"
+            className={({ isActive }) =>
+              isActive ? "navbar-link active-link" : "navbar-link"
+            }
+            onClick={closeMenu}
+          >
+            Login
+          </NavLink>
+
+          <NavLink
+            to="/register"
+            className={({ isActive }) =>
+              isActive ? "navbar-link active-link" : "navbar-link"
+            }
+            onClick={closeMenu}
+          >
+            Register
+          </NavLink>
+        </div>
       </div>
     </nav>
   );
