@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import API from "../api/axios";
-import RichTextEditor from "./RichTextEditor";
+import RichTextEditor from "./richTextEditor";
 
 import "./EditPost.css";
 
