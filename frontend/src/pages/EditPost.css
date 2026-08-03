@@ -98,3 +98,86 @@
   text-align: center;
   margin-top: 1rem;
 }
+
+/* ==========================
+   EDIT POST ACTIONS
+========================== */
+
+.edit-post-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 2rem;
+}
+
+.edit-cancel-button,
+.edit-submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 140px;
+  height: 44px;
+
+  padding: 0 20px;
+
+  border: none;
+  border-radius: 8px;
+
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Cancel */
+
+.edit-cancel-button {
+  background-color: #6b7280;
+  color: #ffffff;
+}
+
+.edit-cancel-button:hover:not(:disabled) {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Update */
+
+.edit-submit-button {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.edit-submit-button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Disabled */
+
+.edit-cancel-button:disabled,
+.edit-submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .edit-post-actions {
+    flex-direction: column-reverse;
+  }
+
+  .edit-cancel-button,
+  .edit-submit-button {
+    width: 100%;
+  }
+}

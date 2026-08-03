@@ -311,20 +311,19 @@ export default function EditPost() {
 
           <div className="edit-post-actions">
             <button
+              type="submit"
+              className="edit-submit-button"
+              disabled={submitting}
+            >
+              {submitting ? "Updating..." : "Update Post"}
+            </button>
+                        <button
               type="button"
               className="edit-cancel-button"
               onClick={() => navigate(`/posts/${id}`)}
               disabled={submitting}
             >
               Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="edit-submit-button"
-              disabled={submitting}
-            >
-              {submitting ? "Updating..." : "Update Post"}
             </button>
           </div>
         </form>
