@@ -228,14 +228,6 @@ export default function CreatePost() {
           </div>
 
           <div className="create-post-actions">
-            <button
-              className="cancel-post-button"
-              type="button"
-              onClick={() => navigate("/")}
-              disabled={loading}
-            >
-              Cancel
-            </button>
 
             <button
               className="publish-post-button"
@@ -243,6 +235,14 @@ export default function CreatePost() {
               disabled={loading}
             >
               {loading ? "Publishing..." : "Publish Post"}
+            </button>
+              <button
+              className="cancel-post-button"
+              type="button"
+              onClick={() => navigate("/")}
+              disabled={loading}
+            >
+              Cancel
             </button>
           </div>
         </form>

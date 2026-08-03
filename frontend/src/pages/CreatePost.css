@@ -131,3 +131,86 @@
     padding: 1.5rem;
   }
 }
+
+/* ==========================
+   CREATE POST ACTIONS
+========================== */
+
+.create-post-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.cancel-post-button,
+.publish-post-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 140px;
+  height: 44px;
+
+  padding: 0 20px;
+
+  border: none;
+  border-radius: 8px;
+
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Cancel */
+
+.cancel-post-button {
+  background-color: #6b7280;
+  color: #ffffff;
+}
+
+.cancel-post-button:hover:not(:disabled) {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Publish */
+
+.publish-post-button {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.publish-post-button:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Disabled */
+
+.cancel-post-button:disabled,
+.publish-post-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .create-post-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-post-button,
+  .publish-post-button {
+    width: 100%;
+  }
+}
