@@ -1,109 +1,245 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import API from "../api/axios";
-import { useAuth } from "../context/AuthContext";
+import RichTextEditor from "./richTextEditor";
+
 import "./CreatePost.css";
 
 export default function CreatePost() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    content: "",
+  });
+
   const [image, setImage] = useState(null);
-  const [category, setCategory] = useState("SQL");
+  const [imagePreview, setImagePreview] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    if (!title || !content) {
-      alert("Title and content are required");
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  }
+
+  function handleContentChange(html) {
+    setFormData((current) => ({
+      ...current,
+      content: html,
+    }));
+  }
+
+  function handleImageChange(event) {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) {
+      setImage(null);
+      setImagePreview("");
+      return;
+    }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setError("Please select a valid image file.");
+      event.target.value = "";
+      return;
+    }
+
+    setError("");
+    setImage(selectedFile);
+    setImagePreview(URL.createObjectURL(selectedFile));
+  }
+
+  function removeImage() {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    setImage(null);
+    setImagePreview("");
+  }
+
+  function isEditorEmpty(html) {
+    if (!html) {
+      return true;
+    }
+
+    const plainText = html
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .trim();
+
+    return plainText.length === 0;
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    setError("");
+
+    if (!formData.title.trim()) {
+      setError("Please enter a post title.");
+      return;
+    }
+
+    if (isEditorEmpty(formData.content)) {
+      setError("Please enter some content for the post.");
       return;
     }
 
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
-      formData.append("category", category);
+      setLoading(true);
 
-      if (image) formData.append("image", image);
+      const postData = new FormData();
 
-      // Send post request
-      await API.post("/posts", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      postData.append("title", formData.title.trim());
+      postData.append("category", formData.category.trim());
+      postData.append("content", formData.content);
+
+      if (image) {
+        postData.append("image", image);
+      }
+
+      const response = await API.post("/posts", postData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      navigate("/");
+      const createdPost = response.data;
+
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+
+      navigate(`/posts/${createdPost._id}`);
     } catch (err) {
-      console.error("🔥 Create post error:", err);
-      alert("Failed to create post");
+      console.error("Create post error:", err);
+
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Unable to create the post. Please try again.",
+      );
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
-return (
-  <div className="create-container">
-    <div className="create-card">
-      <h2>Create New Post</h2>
-
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <div className="form-group">
-          <label>Image (optional)</label>
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-          />
+  return (
+    <main className="create-post-page">
+      <section className="create-post-container">
+        <div className="create-post-header">
+          <h1>Create Post</h1>
+          <p>Write and publish a new blog post.</p>
         </div>
 
-        <div className="form-group">
-          <label>Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
+        {error && (
+          <div className="form-error" role="alert">
+            {error}
+          </div>
+        )}
 
-        <div className="form-group">
-          <label>Category</label>
+        <form
+          className="create-post-form"
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+        >
+          <div className="form-group">
+            <label htmlFor="title">Title</label>
 
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="Programming">Programming</option>
-            <option value="AI">AI</option>
-            <option value="Tutorials">Tutorials</option>
-            <option value="Career">Career</option>
-            <option value="Personal">Personal</option>
-          </select>
-        </div>
-        
-        <div className="form-group">
-          <label>Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
-        </div>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Enter the post title"
+              maxLength={150}
+              required
+            />
+          </div>
 
-        <button type="submit" className="submit-btn">
-          Create Post
-        </button>
-      </form>
+          <div className="form-group">
+            <label htmlFor="category">Category</label>
 
-      {image && (
-        <div className="image-preview">
-          <p>Preview:</p>
-          <img
-            src={URL.createObjectURL(image)}
-            alt="preview"
-          />
-        </div>
-      )}
-    </div>
-  </div>
-);
+            <input
+              id="category"
+              name="category"
+              type="text"
+              value={formData.category}
+              onChange={handleChange}
+              placeholder="Examples: Development, Career, MERN"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="post-image">Featured image</label>
+
+            <input
+              id="post-image"
+              name="image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+
+            {imagePreview && (
+              <div className="image-preview-container">
+                <img
+                  className="image-preview"
+                  src={imagePreview}
+                  alt="Selected post preview"
+                />
+
+                <button
+                  className="remove-image-button"
+                  type="button"
+                  onClick={removeImage}
+                >
+                  Remove image
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Content</label>
+
+            <RichTextEditor
+              value={formData.content}
+              onChange={handleContentChange}
+              placeholder="Write your blog post..."
+            />
+          </div>
+
+          <div className="create-post-actions">
+            <button
+              className="cancel-post-button"
+              type="button"
+              onClick={() => navigate("/")}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+
+            <button
+              className="publish-post-button"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Publishing..." : "Publish Post"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  );
 }
