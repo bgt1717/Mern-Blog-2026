@@ -11,7 +11,7 @@ import {
   Color,
 } from "@tiptap/extension-text-style";
 
-import "./RichTextEditor.css";
+import "./richTextEditor.css";
 
 export default function RichTextEditor({
   value = "",
