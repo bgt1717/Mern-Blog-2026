@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
 import API from "../api/axios";
+import RichTextEditor from "./RichTextEditor";
+
 import "./EditPost.css";
 
 export default function EditPost() {
@@ -9,111 +12,323 @@ export default function EditPost() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [category, setCategory] = useState("");
+
   const [currentImage, setCurrentImage] = useState("");
   const [newImage, setNewImage] = useState(null);
-  const [category, setCategory] = useState("SQL");
+  const [newImagePreview, setNewImagePreview] = useState("");
 
-  // Fetch post
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    const fetchPost = async () => {
-      const res = await API.get(`/posts`);
-      const post = res.data.find((p) => p._id === id);
+    async function fetchPost() {
+      try {
+        setLoading(true);
+        setError("");
 
-      if (post) {
-        setTitle(post.title);
-        setContent(post.content);
-        setCurrentImage(post.image);
-        setCategory(post.category);
+        // Your backend currently returns all posts.
+        const response = await API.get("/posts");
+
+        const foundPost = response.data.find(
+          (post) => String(post._id) === String(id),
+        );
+
+        if (!foundPost) {
+          setError("Post not found.");
+          return;
+        }
+
+        setTitle(foundPost.title || "");
+        setContent(foundPost.content || "");
+        setCategory(foundPost.category || "");
+        setCurrentImage(foundPost.image || "");
+      } catch (err) {
+        console.error("Failed to load post:", err);
+
+        setError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Unable to load this post.",
+        );
+      } finally {
+        setLoading(false);
       }
-    };
+    }
 
     fetchPost();
   }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    return () => {
+      if (newImagePreview) {
+        URL.revokeObjectURL(newImagePreview);
+      }
+    };
+  }, [newImagePreview]);
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("category", category);
+  function handleContentChange(html) {
+    setContent(html);
+  }
 
-    if (newImage) {
-      formData.append("image", newImage);
+  function handleImageChange(event) {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) {
+      return;
     }
 
-    await API.put(`/posts/${id}`, formData);
+    if (!selectedFile.type.startsWith("image/")) {
+      setError("Please select a valid image file.");
+      event.target.value = "";
+      return;
+    }
 
-    navigate("/");
-  };
+    if (newImagePreview) {
+      URL.revokeObjectURL(newImagePreview);
+    }
+
+    setError("");
+    setNewImage(selectedFile);
+    setNewImagePreview(URL.createObjectURL(selectedFile));
+  }
+
+  function removeNewImage() {
+    if (newImagePreview) {
+      URL.revokeObjectURL(newImagePreview);
+    }
+
+    setNewImage(null);
+    setNewImagePreview("");
+  }
+
+  function isEditorEmpty(html) {
+    if (!html) {
+      return true;
+    }
+
+    const temporaryElement = document.createElement("div");
+    temporaryElement.innerHTML = html;
+
+    const plainText =
+      temporaryElement.textContent ||
+      temporaryElement.innerText ||
+      "";
+
+    return plainText.trim().length === 0;
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    setError("");
+
+    if (!title.trim()) {
+      setError("Please enter a post title.");
+      return;
+    }
+
+    if (!category) {
+      setError("Please select a category.");
+      return;
+    }
+
+    if (isEditorEmpty(content)) {
+      setError("Please enter content for the post.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const formData = new FormData();
+
+      formData.append("title", title.trim());
+      formData.append("content", content);
+      formData.append("category", category);
+
+      if (newImage) {
+        formData.append("image", newImage);
+      }
+
+      await API.put(`/posts/${id}`, formData);
+
+      navigate(`/posts/${id}`);
+    } catch (err) {
+      console.error("Failed to update post:", err);
+
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Unable to update the post.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <main className="edit-post-page">
+        <p className="edit-post-message">Loading post...</p>
+      </main>
+    );
+  }
+
+  if (error === "Post not found.") {
+    return (
+      <main className="edit-post-page">
+        <p className="edit-post-message">{error}</p>
+
+        <button
+          type="button"
+          className="edit-cancel-button"
+          onClick={() => navigate("/")}
+        >
+          Return Home
+        </button>
+      </main>
+    );
+  }
 
   return (
-    <div className="edit-container">
-      <h2>Edit Post</h2>
-      
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
-        />
-
-        {/* Category Dropdown */}
-        <div className="form-group">
-          <label>Category</label>
-
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="Web Development">Programming</option>
-            <option value="SQL">SQL</option>
-            <option value="AI">AI</option>
-            <option value="Projects">Career</option>
-            <option value="Personal">Personal</option>
-          </select>
+    <main className="edit-post-page">
+      <section className="edit-container">
+        <div className="edit-post-header">
+          <h1>Edit Post</h1>
+          <p>Update the title, category, content, or featured image.</p>
         </div>
 
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Content"
-        />
-
-
-        {/* Show existing image */}
-        {currentImage && !newImage && (
-          <div>
-            <p>Current Image:</p>
-            <img
-              src={currentImage}
-              alt="Current"
-              style={{ width: "200px", marginBottom: "10px" }}
-            />
+        {error && (
+          <div className="edit-post-error" role="alert">
+            {error}
           </div>
         )}
 
-        {/* Show preview of new image */}
-        {newImage && (
-          <div>
-            <p>New Image Preview:</p>
-            <img
-              src={URL.createObjectURL(newImage)}
-              alt="Preview"
-              style={{ width: "200px", marginBottom: "10px" }}
+        <form
+          className="edit-post-form"
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+        >
+          <div className="form-group">
+            <label htmlFor="edit-title">Title</label>
+
+            <input
+              id="edit-title"
+              name="title"
+              type="text"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Enter the post title"
+              maxLength={150}
+              required
             />
           </div>
-        )}
 
-        <input
-          type="file"
-          onChange={(e) => setNewImage(e.target.files[0])}
-          
-        />
-        
-        <button type="submit">Update Post</button>
-      </form>
-    </div>
+          <div className="form-group">
+            <label htmlFor="edit-category">Category</label>
+
+            <select
+              id="edit-category"
+              name="category"
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              required
+            >
+              <option value="">Select a category</option>
+              <option value="Programming">Programming</option>
+              <option value="MERN">MERN</option>
+              <option value="JavaScript">JavaScript</option>
+              <option value="React">React</option>
+              <option value="Node.js">Node.js</option>
+              <option value="Express">Express</option>
+              <option value="MongoDB">MongoDB</option>
+              <option value="SQL">SQL</option>
+              <option value="AI">AI</option>
+              <option value="Projects">Projects</option>
+              <option value="Career">Career</option>
+              <option value="Personal">Personal</option>
+              <option value="Technology">Technology</option>
+              <option value="Tutorial">Tutorial</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Content</label>
+
+            <RichTextEditor
+              value={content}
+              onChange={handleContentChange}
+              placeholder="Update your blog post..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="edit-image">Featured image</label>
+
+            {currentImage && !newImagePreview && (
+              <div className="edit-image-preview-container">
+                <p className="edit-image-label">Current image</p>
+
+                <img
+                  src={currentImage}
+                  alt={title || "Current post"}
+                  className="edit-image-preview"
+                />
+              </div>
+            )}
+
+            {newImagePreview && (
+              <div className="edit-image-preview-container">
+                <p className="edit-image-label">New image preview</p>
+
+                <img
+                  src={newImagePreview}
+                  alt="New post preview"
+                  className="edit-image-preview"
+                />
+
+                <button
+                  type="button"
+                  className="remove-new-image-button"
+                  onClick={removeNewImage}
+                >
+                  Remove new image
+                </button>
+              </div>
+            )}
+
+            <input
+              id="edit-image"
+              name="image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </div>
+
+          <div className="edit-post-actions">
+            <button
+              type="button"
+              className="edit-cancel-button"
+              onClick={() => navigate(`/posts/${id}`)}
+              disabled={submitting}
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className="edit-submit-button"
+              disabled={submitting}
+            >
+              {submitting ? "Updating..." : "Update Post"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
   );
 }

@@ -68,33 +68,64 @@
   margin-top: 1rem;
 }
 
-/* Buttons */
+/* Button Row */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+/* Shared Button Styles */
 .edit-btn,
 .delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 90px;
+  height: 40px;
+  padding: 0 16px;
+
   border: none;
-  padding: 8px 16px;
   border-radius: 6px;
+
   color: white;
-  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
   font-weight: 600;
-  transition: background 0.2s ease;
+  line-height: 1;
+  text-decoration: none;
+
+  cursor: pointer;
+  box-sizing: border-box;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .edit-btn {
-  background: #444;
-  margin-right: 10px;
+  background-color: #444;
 }
 
 .edit-btn:hover {
-  background: #333;
+  color: white;
+  background-color: #333;
+  text-decoration: none;
 }
 
 .delete-btn {
-  background: #d62828;
+  background-color: #d62828;
 }
 
 .delete-btn:hover {
-  background: #b71c1c;
+  background-color: #b71c1c;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  transform: translateY(-1px);
 }
 
 /* Loading & Error */

@@ -25,6 +25,11 @@
   color: #333;
 }
 
+.create-post-header {
+  text-align: center;
+  margin-top: 1rem;
+}
+
 /* Form Groups */
 .form-group {
   display: flex;
