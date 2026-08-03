@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+
 import "./Home.css";
 
 export default function Home() {
@@ -12,33 +14,53 @@ export default function Home() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    async function fetchPosts() {
       try {
+        setLoading(true);
+        setError("");
+
         const res = await API.get("/posts");
         setPosts(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load posts:", err);
         setError("Failed to load posts");
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchPosts();
   }, []);
 
-  const handleDelete = async (postId) => {
+  async function handleDelete(postId) {
     const confirmDelete = window.confirm("Delete this post?");
-    if (!confirmDelete) return;
+
+    if (!confirmDelete) {
+      return;
+    }
 
     try {
       await API.delete(`/posts/${postId}`);
-      setPosts(posts.filter((p) => p._id !== postId));
+
+      setPosts((currentPosts) =>
+        currentPosts.filter((post) => post._id !== postId),
+      );
     } catch (err) {
-      console.error(err);
-      alert("Delete failed");
+      console.error("Delete failed:", err);
+      window.alert("Delete failed");
     }
-  };
+  }
+
+  function isPostOwner(post) {
+    if (!user) {
+      return false;
+    }
+
+    const postUserId = post.user?._id || post.user;
+    const currentUserId = user._id || user.id || user.userId;
+
+    return String(postUserId) === String(currentUserId);
+  }
 
   if (loading) {
     return <p className="loading">Loading posts...</p>;
@@ -49,7 +71,7 @@ export default function Home() {
   }
 
   return (
-    <div className="home-container">
+    <main className="home-container">
       <h1 className="home-title">Latest Posts</h1>
 
       {posts.length === 0 && (
@@ -57,55 +79,65 @@ export default function Home() {
       )}
 
       {posts.map((post) => (
-        <div className="post-card" key={post._id}>
+        <article className="post-card" key={post._id}>
+          {post.category && (
+            <span className="category-badge">
+              {post.category}
+            </span>
+          )}
 
-          <span className="category-badge">{post.category}</span>
-
-          <h3 className="post-title">{post.title}</h3>
+          <h2 className="post-title">
+          <Link
+            to={`/posts/${post._id}`}
+            className="post-title-link"
+          >
+            {post.title}
+          </Link>
+          </h2>
 
           {post.image && (
+          <Link to={`/posts/${post._id}`}>
             <img
               src={post.image}
               alt={post.title}
               className="post-image"
             />
+          </Link>
           )}
-          {/* Shows the first 220 characters of the post content, followed by "..." if it's longer than that. */}
-          <p className="post-content">
-          {post.content.length > 85
-            ? `${post.content.substring(0,85)}...`
-            : post.content}
-        </p>
-            <Link
+
+          <Link
             to={`/posts/${post._id}`}
             className="read-more-btn"
           >
-            Read More →
+            Read Article →
           </Link>
 
-          <small className="post-author">
-            By {post.user?.username}
-          </small>
+          {post.user?.username && (
+            <small className="post-author">
+            <br/>  Author: {post.user.username}
+            </small>
+          )}
 
-          {user &&
-            String(post.user?._id || post.user) === String(user._id) && (
-              <div className="post-actions">
-                <Link to={`/edit/${post._id}`}>
-                  <button className="edit-btn">
-                    Edit
-                  </button>
-                </Link>
+          {isPostOwner(post) && (
+            <div className="post-actions">
+              <Link
+                to={`/edit/${post._id}`}
+                className="edit-btn"
+              >
+                Edit
+              </Link>
 
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(post._id)}
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-        </div>
+              <button
+                type="button"
+                className="delete-btn"
+                onClick={() => handleDelete(post._id)}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </article>
       ))}
-    </div>
+    </main>
   );
 }

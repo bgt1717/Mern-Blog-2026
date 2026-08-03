@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
 import API from "../api/axios";
 import "./Post.css";
 
@@ -8,20 +9,38 @@ export default function Post() {
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchPost = async () => {
+    async function fetchPost() {
       try {
-        const res = await API.get("/posts");
-        const foundPost = res.data.find((p) => p._id === id);
+        setLoading(true);
+        setError("");
+
+        const response = await API.get("/posts");
+
+        const foundPost = response.data.find(
+          (currentPost) => String(currentPost._id) === String(id),
+        );
+
+        if (!foundPost) {
+          setError("Post not found.");
+          return;
+        }
 
         setPost(foundPost);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load post:", err);
+
+        setError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Unable to load this post.",
+        );
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchPost();
   }, [id]);
@@ -30,21 +49,29 @@ export default function Post() {
     return <h2 className="loading">Loading...</h2>;
   }
 
+  if (error) {
+    return <h2 className="loading">{error}</h2>;
+  }
+
   if (!post) {
     return <h2 className="loading">Post not found.</h2>;
   }
 
   return (
-    <div className="post-page">
-      <span className="post-category">
-        {post.category}
-      </span>
+    <main className="post-page">
+      {post.category && (
+        <span className="post-category">
+          {post.category}
+        </span>
+      )}
 
       <h1>{post.title}</h1>
 
-      <p className="post-author">
-        By {post.user?.username}
-      </p>
+      {post.user?.username && (
+        <p className="post-author">
+          By {post.user.username}
+        </p>
+      )}
 
       {post.image && (
         <img
@@ -54,9 +81,12 @@ export default function Post() {
         />
       )}
 
-      <div className="post-content-page">
-        {post.content}
-      </div>
-    </div>
+      <div
+        className="post-content-page"
+        dangerouslySetInnerHTML={{
+          __html: post.content || "",
+        }}
+      />
+    </main>
   );
 }

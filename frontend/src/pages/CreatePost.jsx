@@ -166,20 +166,27 @@ export default function CreatePost() {
               required
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="category">Category</label>
 
-            <input
+            <select
               id="category"
               name="category"
-              type="text"
               value={formData.category}
               onChange={handleChange}
-              placeholder="Examples: Development, Career, MERN"
-            />
+              required
+            >
+              <option value="Other">Select a category</option>
+              <option value="Web Development">Web Development</option>
+              <option value="AI">AI</option>
+              <option value="Projects">Projects</option>
+              <option value="Career">Career</option>
+              <option value="Personal">Personal</option>
+              <option value="Technology">Technology</option>
+              <option value="News">News</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
-
           <div className="form-group">
             <label htmlFor="post-image">Featured image</label>
 

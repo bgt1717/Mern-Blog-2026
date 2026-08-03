@@ -27,13 +27,15 @@ const postSchema = new mongoose.Schema(
       required: true,
       enum: [
         "Web Development",
-        "SQL",
         "AI",
         "Projects",
         "Career",
-        "Personal"
+        "Personal",
+        "Technology",
+        "News",
+        "Other"
       ],
-      default: "SQL",
+      default: "Other",
     },
   },
   { timestamps: true }

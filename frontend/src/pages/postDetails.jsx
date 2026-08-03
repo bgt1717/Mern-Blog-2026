@@ -9,7 +9,6 @@ import "./PostDetails.css";
 export default function PostDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const { user } = useAuth();
 
   const [post, setPost] = useState(null);
@@ -42,26 +41,77 @@ export default function PostDetails() {
     fetchPost();
   }, [id]);
 
-  function getOwnerId() {
+  function decodeHtml(html = "") {
+    const textarea = document.createElement("textarea");
+
+    textarea.innerHTML = html;
+
+    return textarea.value;
+  }
+
+  function getOwner() {
     if (!post) {
       return null;
     }
 
-    if (typeof post.author === "object") {
-      return post.author?._id;
+    return post.user || post.author || post.createdBy || null;
+  }
+
+  function getOwnerId() {
+    const owner = getOwner();
+
+    if (!owner) {
+      return null;
     }
 
-    return post.author || post.user || post.createdBy;
+    if (typeof owner === "object") {
+      return owner._id || owner.id || owner.userId || null;
+    }
+
+    return owner;
   }
 
   function getCurrentUserId() {
-    return user?._id || user?.id || user?.userId;
+    return user?._id || user?.id || user?.userId || null;
   }
 
-  const isOwner =
-    Boolean(getOwnerId()) &&
-    Boolean(getCurrentUserId()) &&
-    String(getOwnerId()) === String(getCurrentUserId());
+  function getAuthorName() {
+    const owner = getOwner();
+
+    if (!owner || typeof owner === "string") {
+      return "";
+    }
+
+    return owner.username || owner.name || owner.email || "";
+  }
+
+  function getImageUrl() {
+    return (
+      post?.imageUrl ||
+      post?.image ||
+      post?.coverImage ||
+      post?.featuredImage ||
+      ""
+    );
+  }
+
+  function formatDate(dateValue) {
+    if (!dateValue) {
+      return "";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -92,49 +142,12 @@ export default function PostDetails() {
     }
   }
 
-  function formatDate(dateValue) {
-    if (!dateValue) {
-      return "";
-    }
-
-    return new Date(dateValue).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
-
-  function getAuthorName() {
-    if (!post?.author) {
-      return "";
-    }
-
-    if (typeof post.author === "string") {
-      return "";
-    }
-
-    return (
-      post.author.username ||
-      post.author.name ||
-      post.author.email ||
-      ""
-    );
-  }
-
-  function getImageUrl() {
-    return (
-      post?.imageUrl ||
-      post?.image ||
-      post?.coverImage ||
-      post?.featuredImage ||
-      ""
-    );
-  }
-
   if (loading) {
     return (
       <main className="post-details-page">
-        <div className="post-details-message">Loading post...</div>
+        <div className="post-details-message">
+          Loading post...
+        </div>
       </main>
     );
   }
@@ -167,8 +180,18 @@ export default function PostDetails() {
     );
   }
 
+  const ownerId = getOwnerId();
+  const currentUserId = getCurrentUserId();
+
+  const isOwner =
+    Boolean(ownerId) &&
+    Boolean(currentUserId) &&
+    String(ownerId) === String(currentUserId);
+
   const imageUrl = getImageUrl();
   const authorName = getAuthorName();
+
+  const renderedContent = decodeHtml(post.content || "");
 
   return (
     <main className="post-details-page">
@@ -187,7 +210,7 @@ export default function PostDetails() {
           <img
             className="post-details-image"
             src={imageUrl}
-            alt={post.title}
+            alt={post.title || "Blog post"}
           />
         )}
 
@@ -212,7 +235,7 @@ export default function PostDetails() {
         <div
           className="post-content rich-text-content"
           dangerouslySetInnerHTML={{
-            __html: post.content || "",
+            __html: renderedContent,
           }}
         />
 
@@ -220,7 +243,7 @@ export default function PostDetails() {
           <div className="post-owner-actions">
             <Link
               className="edit-post-button"
-              to={`/posts/${post._id}/edit`}
+              to={`/edit/${post._id}`}
             >
               Edit Post
             </Link>
