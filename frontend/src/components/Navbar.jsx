@@ -35,7 +35,7 @@ export default function Navbar() {
           className="navbar-logo"
           onClick={closeMenu}
         >
-          Townsend Blog
+          Bryce's Blog
         </Link>
 
         <button

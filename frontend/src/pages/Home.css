@@ -172,3 +172,10 @@
 .read-more-btn:hover {
   text-decoration: underline;
 }
+
+.home-description {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}

@@ -7,11 +7,31 @@ import { useAuth } from "../context/AuthContext";
 import "./Home.css";
 
 export default function Home() {
+  //Destructuring the user object from the AuthContext to get the current authenticated user.
   const { user } = useAuth();
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  /* 
+   useEffect Hook allows us to perform side effects in functional components, such as fetching data when the component mounts.
+   The empty dependency array [] ensures that the effect runs only once when the component mounts.
+   This effect will run once when the component mounts and will not re-run on subsequent renders.
+   This ensures that the component fetches the latest posts only once when it is mounted.
+   /
+
+  /*
+  Component renders
+       ↓
+    useEffect runs
+          ↓
+    Fetch blog posts
+          ↓
+    Store posts in state
+          ↓
+    React renders the posts
+  */
 
   useEffect(() => {
     async function fetchPosts() {
@@ -73,6 +93,9 @@ export default function Home() {
   return (
     <main className="home-container">
       <h1 className="home-title">Latest Posts</h1>
+      <p className="home-description">
+        Welcome to the blog! Here you can find the latest posts from various authors.
+      </p>
 
       {posts.length === 0 && (
         <p className="no-posts">No posts yet.</p>
