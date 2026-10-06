@@ -32,14 +32,18 @@ export default function Home() {
           ↓
     React renders the posts
   */
-
   useEffect(() => {
     async function fetchPosts() {
       try {
+        //The reason we set loading to true and clear any previous error is to indicate that we are in the process of fetching data.
+        //If a user tries to refresh the page or navigate away and back, the loading state will be reset.
         setLoading(true);
         setError("");
-
         const res = await API.get("/posts");
+        //Log the fetched posts to the console for debugging purposes.
+        //console.log(res.data);
+        //Log the first post to the console for debugging purposes.
+        //console.log(res.data[1]);
         setPosts(res.data);
       } catch (err) {
         console.error("Failed to load posts:", err);
