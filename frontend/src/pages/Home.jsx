@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import "./Home.css";
@@ -13,6 +13,9 @@ export default function Home() {
   const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("Career");
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Fetch blog posts from the backend
   useEffect(() => {
     async function fetchPosts() {
       try {
@@ -32,6 +35,36 @@ export default function Home() {
     fetchPosts();
   }, []);
 
+  // Listen for Career and Projects navbar selections
+  useEffect(() => {
+    function handleCategoryChange(event) {
+      setActiveCategory(event.detail);
+    }
+
+    window.addEventListener(
+      "select-blog-category",
+      handleCategoryChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "select-blog-category",
+        handleCategoryChange
+      );
+    };
+  }, []);
+
+  // Handle category navigation from other pages
+  useEffect(() => {
+    const category = searchParams.get("category");
+
+    if (category === "Career" || category === "Projects") {
+      setActiveCategory(category);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  // Delete a blog post
   async function handleDelete(postId) {
     const confirmDelete = window.confirm("Delete this post?");
 
@@ -49,6 +82,7 @@ export default function Home() {
     }
   }
 
+  // Check whether the logged-in user owns a post
   function isPostOwner(post) {
     if (!user) return false;
 
@@ -58,6 +92,7 @@ export default function Home() {
     return String(postUserId) === String(currentUserId);
   }
 
+  // Filter posts based on the selected category
   const filteredPosts = posts.filter(
     (post) =>
       post.category?.trim().toLowerCase() ===
@@ -81,6 +116,7 @@ export default function Home() {
         and software development projects.
       </p>
 
+      {/* Category navigation */}
       <div className="category-navigation">
         <button
           type="button"
@@ -103,12 +139,14 @@ export default function Home() {
         </button>
       </div>
 
+      {/* Selected category heading */}
       <h2 className="category-heading">
         {activeCategory === "Career"
           ? "Career & Professional Development"
           : "Projects & Development"}
       </h2>
 
+      {/* Display posts */}
       {filteredPosts.length === 0 ? (
         <p className="no-posts">
           {activeCategory === "Career"
@@ -118,12 +156,14 @@ export default function Home() {
       ) : (
         filteredPosts.map((post) => (
           <article className="post-card" key={post._id}>
+            {/* Category badge */}
             {post.category && (
               <span className="category-badge">
                 {post.category}
               </span>
             )}
 
+            {/* Post title */}
             <h2 className="post-title">
               <Link
                 to={`/posts/${post._id}`}
@@ -133,6 +173,7 @@ export default function Home() {
               </Link>
             </h2>
 
+            {/* Post image */}
             {post.image && (
               <Link to={`/posts/${post._id}`}>
                 <img
@@ -143,6 +184,7 @@ export default function Home() {
               </Link>
             )}
 
+            {/* Read article link */}
             <Link
               to={`/posts/${post._id}`}
               className="read-more-btn"
@@ -150,6 +192,7 @@ export default function Home() {
               Read Article →
             </Link>
 
+            {/* Author */}
             {post.user?.username && (
               <small className="post-author">
                 <br />
@@ -157,6 +200,7 @@ export default function Home() {
               </small>
             )}
 
+            {/* Edit and delete controls */}
             {isPostOwner(post) && (
               <div className="post-actions">
                 <Link

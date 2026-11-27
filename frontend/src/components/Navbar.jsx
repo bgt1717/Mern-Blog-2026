@@ -9,10 +9,22 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const isLoggedIn = Boolean(user);
-
   function closeMenu() {
     setMenuOpen(false);
+  }
+
+  function handleCategoryNavigation(category) {
+    closeMenu();
+
+    if (window.location.pathname === "/") {
+      window.dispatchEvent(
+        new CustomEvent("select-blog-category", {
+          detail: category,
+        })
+      );
+    } else {
+      navigate(`/?category=${category}`);
+    }
   }
 
   function handleLogout() {
@@ -30,11 +42,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <Link
-          to="/"
-          className="navbar-logo"
-          onClick={closeMenu}
-        >
+        <Link to="/" className="navbar-logo" onClick={closeMenu}>
           Bryce's Blog
         </Link>
 
@@ -59,7 +67,23 @@ export default function Navbar() {
             Home
           </NavLink>
 
-          {isLoggedIn && (
+          <button
+            type="button"
+            className="navbar-link"
+            onClick={() => handleCategoryNavigation("Career")}
+          >
+            Career
+          </button>
+
+          <button
+            type="button"
+            className="navbar-link"
+            onClick={() => handleCategoryNavigation("Projects")}
+          >
+            Projects
+          </button>
+
+          {user && (
             <>
               <NavLink
                 to="/create"
