@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -7,43 +8,23 @@ import { useAuth } from "../context/AuthContext";
 import "./Home.css";
 
 export default function Home() {
-  //Destructuring the user object from the AuthContext to get the current authenticated user.
   const { user } = useAuth();
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  
-  /* 
-   useEffect Hook allows us to perform side effects in functional components, such as fetching data when the component mounts.
-   The empty dependency array [] ensures that the effect runs only once when the component mounts.
-   This effect will run once when the component mounts and will not re-run on subsequent renders.
-   This ensures that the component fetches the latest posts only once when it is mounted.
-   /
 
-  /*
-  Component renders
-       ↓
-    useEffect runs
-          ↓
-    Fetch blog posts
-          ↓
-    Store posts in state
-          ↓
-    React renders the posts
-  */
+  // Career is the default category visitors see.
+  const [activeCategory, setActiveCategory] = useState("Career");
+
+  // Fetch all blog posts.
   useEffect(() => {
     async function fetchPosts() {
       try {
-        //The reason we set loading to true and clear any previous error is to indicate that we are in the process of fetching data.
-        //If a user tries to refresh the page or navigate away and back, the loading state will be reset.
         setLoading(true);
         setError("");
+
         const res = await API.get("/posts");
-        //Log the fetched posts to the console for debugging purposes.
-        //console.log(res.data);
-        //Log the first post to the console for debugging purposes.
-        //console.log(res.data[1]);
         setPosts(res.data);
       } catch (err) {
         console.error("Failed to load posts:", err);
@@ -56,6 +37,7 @@ export default function Home() {
     fetchPosts();
   }, []);
 
+  // Delete a post.
   async function handleDelete(postId) {
     const confirmDelete = window.confirm("Delete this post?");
 
@@ -67,7 +49,7 @@ export default function Home() {
       await API.delete(`/posts/${postId}`);
 
       setPosts((currentPosts) =>
-        currentPosts.filter((post) => post._id !== postId),
+        currentPosts.filter((post) => post._id !== postId)
       );
     } catch (err) {
       console.error("Delete failed:", err);
@@ -75,6 +57,7 @@ export default function Home() {
     }
   }
 
+  // Check whether the logged-in user owns the post.
   function isPostOwner(post) {
     if (!user) {
       return false;
@@ -86,6 +69,14 @@ export default function Home() {
     return String(postUserId) === String(currentUserId);
   }
 
+  // Display only posts belonging to the selected category.
+  const filteredPosts = posts.filter((post) => {
+    return (
+      post.category?.trim().toLowerCase() ===
+      activeCategory.toLowerCase()
+    );
+  });
+
   if (loading) {
     return <p className="loading">Loading posts...</p>;
   }
@@ -96,75 +87,116 @@ export default function Home() {
 
   return (
     <main className="home-container">
-      <h1 className="home-title">Latest Posts</h1>
+
+      {/* Blog Header */}
+      <h1 className="home-title">Bryce Townsend's Blog</h1>
+
       <p className="home-description">
-        Welcome to the blog! Below you will find the latest posts. Feel free to create a new post or explore the existing ones. Enjoy reading!
+        Career insights, professional experience, data analytics,
+        and software development projects.
       </p>
 
-      {posts.length === 0 && (
-        <p className="no-posts">No posts yet.</p>
-      )}
+      {/* Category Navigation */}
+      <div className="category-navigation">
+        <button
+          type="button"
+          className={`category-tab ${
+            activeCategory === "Career" ? "active" : ""
+          }`}
+          onClick={() => setActiveCategory("Career")}
+        >
+          Career
+        </button>
 
-      {posts.map((post) => (
-        <article className="post-card" key={post._id}>
-          {post.category && (
-            <span className="category-badge">
-              {post.category}
-            </span>
-          )}
+        <button
+          type="button"
+          className={`category-tab ${
+            activeCategory === "Projects" ? "active" : ""
+          }`}
+          onClick={() => setActiveCategory("Projects")}
+        >
+          Projects
+        </button>
+      </div>
 
-          <h2 className="post-title">
-          <Link
-            to={`/posts/${post._id}`}
-            className="post-title-link"
-          >
-            {post.title}
-          </Link>
-          </h2>
+      {/* Section Heading */}
+      <h2 className="category-heading">
+        {activeCategory === "Career"
+          ? "Career & Professional Development"
+          : "Projects & Development"}
+      </h2>
 
-          {post.image && (
-          <Link to={`/posts/${post._id}`}>
-            <img
-              src={post.image}
-              alt={post.title}
-              className="post-image"
-            />
-          </Link>
-          )}
+      {/* Posts */}
+      {filteredPosts.length === 0 ? (
+        <p className="no-posts">
+          {activeCategory === "Career"
+            ? "No career posts yet. Check back soon!"
+            : "No project posts yet. Check back soon!"}
+        </p>
+      ) : (
+        filteredPosts.map((post) => (
+          <article className="post-card" key={post._id}>
 
-          <Link
-            to={`/posts/${post._id}`}
-            className="read-more-btn"
-          >
-            Read Article →
-          </Link>
+            {post.category && (
+              <span className="category-badge">
+                {post.category}
+              </span>
+            )}
 
-          {post.user?.username && (
-            <small className="post-author">
-            <br/>  Author: {post.user.username}
-            </small>
-          )}
-
-          {isPostOwner(post) && (
-            <div className="post-actions">
+            <h2 className="post-title">
               <Link
-                to={`/edit/${post._id}`}
-                className="edit-btn"
+                to={`/posts/${post._id}`}
+                className="post-title-link"
               >
-                Edit
+                {post.title}
               </Link>
+            </h2>
 
-              <button
-                type="button"
-                className="delete-btn"
-                onClick={() => handleDelete(post._id)}
-              >
-                Delete
-              </button>
-            </div>
-          )}
-        </article>
-      ))}
+            {post.image && (
+              <Link to={`/posts/${post._id}`}>
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="post-image"
+                />
+              </Link>
+            )}
+
+            <Link
+              to={`/posts/${post._id}`}
+              className="read-more-btn"
+            >
+              Read Article →
+            </Link>
+
+            {post.user?.username && (
+              <small className="post-author">
+                <br />
+                Author: {post.user.username}
+              </small>
+            )}
+
+            {isPostOwner(post) && (
+              <div className="post-actions">
+                <Link
+                  to={`/edit/${post._id}`}
+                  className="edit-btn"
+                >
+                  Edit
+                </Link>
+
+                <button
+                  type="button"
+                  className="delete-btn"
+                  onClick={() => handleDelete(post._id)}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </article>
+        ))
+      )}
     </main>
   );
 }
