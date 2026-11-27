@@ -98,7 +98,7 @@ export default function Home() {
     <main className="home-container">
       <h1 className="home-title">Latest Posts</h1>
       <p className="home-description">
-        Welcome to the blog! Here you can find the latest posts from various authors.
+        Welcome to the blog! Below you will find the latest posts. Feel free to create a new post or explore the existing ones. Enjoy reading!
       </p>
 
       {posts.length === 0 && (
