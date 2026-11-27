@@ -1,9 +1,16 @@
 import express from "express";
-import { registerUser, loginUser } from "../controllers/authController.js";
+import { loginUser } from "../controllers/authController.js";
 
 const router = express.Router();
 
-router.post("/register", registerUser); // ✅ NO ()
+// Public registration is disabled.
+router.post("/register", (req, res) => {
+  return res.status(403).json({
+    message: "Public registration is disabled."
+  });
+});
+
+// Existing users can still log in.
 router.post("/login", loginUser);
 
 router.get("/test", (req, res) => {
@@ -16,6 +23,5 @@ router.get("/protected", (req, res) => {
     authHeader: req.headers.authorization,
   });
 });
-
 
 export default router;

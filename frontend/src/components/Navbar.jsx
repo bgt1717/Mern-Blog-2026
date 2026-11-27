@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -78,23 +79,13 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <>
-              <NavLink
-                to="/login"
-                className={navLinkClass}
-                onClick={closeMenu}
-              >
-                Login
-              </NavLink>
-
-              <NavLink
-                to="/register"
-                className={navLinkClass}
-                onClick={closeMenu}
-              >
-                Register
-              </NavLink>
-            </>
+            <NavLink
+              to="/login"
+              className={navLinkClass}
+              onClick={closeMenu}
+            >
+              Login
+            </NavLink>
           )}
         </div>
       </div>
