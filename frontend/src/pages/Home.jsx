@@ -1,10 +1,8 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
-
 import "./Home.css";
 
 export default function Home() {
@@ -13,11 +11,8 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Career is the default category visitors see.
   const [activeCategory, setActiveCategory] = useState("Career");
 
-  // Fetch all blog posts.
   useEffect(() => {
     async function fetchPosts() {
       try {
@@ -37,13 +32,10 @@ export default function Home() {
     fetchPosts();
   }, []);
 
-  // Delete a post.
   async function handleDelete(postId) {
     const confirmDelete = window.confirm("Delete this post?");
 
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     try {
       await API.delete(`/posts/${postId}`);
@@ -57,11 +49,8 @@ export default function Home() {
     }
   }
 
-  // Check whether the logged-in user owns the post.
   function isPostOwner(post) {
-    if (!user) {
-      return false;
-    }
+    if (!user) return false;
 
     const postUserId = post.user?._id || post.user;
     const currentUserId = user._id || user.id || user.userId;
@@ -69,13 +58,11 @@ export default function Home() {
     return String(postUserId) === String(currentUserId);
   }
 
-  // Display only posts belonging to the selected category.
-  const filteredPosts = posts.filter((post) => {
-    return (
+  const filteredPosts = posts.filter(
+    (post) =>
       post.category?.trim().toLowerCase() ===
       activeCategory.toLowerCase()
-    );
-  });
+  );
 
   if (loading) {
     return <p className="loading">Loading posts...</p>;
@@ -87,8 +74,6 @@ export default function Home() {
 
   return (
     <main className="home-container">
-
-      {/* Blog Header */}
       <h1 className="home-title">Bryce Townsend's Blog</h1>
 
       <p className="home-description">
@@ -96,7 +81,6 @@ export default function Home() {
         and software development projects.
       </p>
 
-      {/* Category Navigation */}
       <div className="category-navigation">
         <button
           type="button"
@@ -119,14 +103,12 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Section Heading */}
       <h2 className="category-heading">
         {activeCategory === "Career"
           ? "Career & Professional Development"
           : "Projects & Development"}
       </h2>
 
-      {/* Posts */}
       {filteredPosts.length === 0 ? (
         <p className="no-posts">
           {activeCategory === "Career"
@@ -136,7 +118,6 @@ export default function Home() {
       ) : (
         filteredPosts.map((post) => (
           <article className="post-card" key={post._id}>
-
             {post.category && (
               <span className="category-badge">
                 {post.category}

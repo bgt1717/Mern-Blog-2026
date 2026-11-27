@@ -6,7 +6,6 @@ import "./Navbar.css";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -19,7 +18,7 @@ export default function Navbar() {
   function handleLogout() {
     logout();
     closeMenu();
-    navigate("/login");
+    navigate("/");
   }
 
   function navLinkClass({ isActive }) {
@@ -60,7 +59,7 @@ export default function Navbar() {
             Home
           </NavLink>
 
-          {isLoggedIn ? (
+          {isLoggedIn && (
             <>
               <NavLink
                 to="/create"
@@ -78,14 +77,6 @@ export default function Navbar() {
                 Logout
               </button>
             </>
-          ) : (
-            <NavLink
-              to="/login"
-              className={navLinkClass}
-              onClick={closeMenu}
-            >
-              Login
-            </NavLink>
           )}
         </div>
       </div>
